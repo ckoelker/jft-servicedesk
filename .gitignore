@@ -1,0 +1,28 @@
+# --- Build-Ergebnisse -------------------------------------------------------
+target/
+build/
+bin/
+*.class
+*.jar
+
+# --- IDE --------------------------------------------------------------------
+.project
+.classpath
+.settings/
+.factorypath
+.apt_generated*/
+.idea/
+*.iml
+.vscode/
+
+# --- Betriebssystem ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Geheimnisse ------------------------------------------------------------
+.env
+*.key
+
+# --- Ausgaben der Export-Beispiele ------------------------------------------
+ziel/

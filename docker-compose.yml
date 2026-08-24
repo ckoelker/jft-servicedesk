@@ -1,0 +1,37 @@
+# Die Datenbank des ServiceDesk.
+#
+# Das Image bringt die Erweiterung "vector" schon mit - die brauchen wir erst
+# am Freitag fuer die Handbuchsuche, aber nachtraeglich austauschen waere
+# mitten in der Woche unnoetiger Aufwand.
+#
+# Alles unter datenbank/ laeuft beim allerersten Start einmal durch, in
+# alphabetischer Reihenfolge. Danach nie wieder: die Daten liegen im Volume und
+# ueberleben jeden Neustart.
+#
+#   docker compose up -d      starten
+#   docker compose down       anhalten, Daten bleiben
+#   docker compose down -v    anhalten und alles wegwerfen (naechster Start
+#                             legt Schema und Beispieldaten neu an)
+
+services:
+  datenbank:
+    image: pgvector/pgvector:pg17
+    container_name: servicedesk-db
+    environment:
+      POSTGRES_DB: servicedesk
+      POSTGRES_USER: servicedesk
+      POSTGRES_PASSWORD: servicedesk
+    ports:
+      # 5433 nach aussen, damit ein schon laufendes Postgres auf 5432 nicht stoert.
+      - "5433:5432"
+    volumes:
+      - ./datenbank:/docker-entrypoint-initdb.d:ro
+      - servicedesk-daten:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U servicedesk -d servicedesk"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  servicedesk-daten:

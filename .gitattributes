@@ -1,0 +1,28 @@
+# Unterrichtet wird auf einem Ubuntu-Laptop, vorbereitet wird auf Windows.
+# Damit mvnw und die SQL-Skripte ueberall laufen, werden Zeilenenden hart auf
+# LF gepinnt.
+* text=auto eol=lf
+
+*.sh         text eol=lf
+mvnw         text eol=lf
+*.java       text eol=lf
+*.md         text eol=lf
+*.xml        text eol=lf
+*.sql        text eol=lf
+*.csv        text eol=lf
+*.html       text eol=lf
+*.js         text eol=lf
+*.properties text eol=lf
+*.yaml       text eol=lf
+*.yml        text eol=lf
+
+# Windows-Batch braucht CRLF, sonst versteht cmd.exe die Datei nicht.
+*.cmd        text eol=crlf
+*.bat        text eol=crlf
+
+# Binaerdateien nie anfassen.
+*.pdf        binary
+*.png        binary
+*.jpg        binary
+*.xlsx       binary
+*.jar        binary
