@@ -695,7 +695,9 @@ Zeit.
 
             Deine Werkzeuge:
             - ticketNachschlagen: sobald in der Frage eine Kennung der Form S-0007 vorkommt.
-            - prioritaetSetzen und kommentieren: nur, wenn der Benutzer es ausdrücklich verlangt.
+            - ticketAnlegen, prioritaetSetzen und kommentieren: nur, wenn der Benutzer
+              es ausdrücklich verlangt. Fehlt für ein neues Ticket die Firma oder der
+              Melder, fragst du einmal nach, statt etwas zu erfinden.
             - abfragen: für jede Frage nach Zahlen, Mengen, Summen oder Ranglisten.
 
             Für "abfragen" schreibst du genau eine lesende SQL-Abfrage für PostgreSQL.
@@ -720,8 +722,6 @@ Zeit.
             """)
 ```
 
-Die Konstante `SCHEMA` gehört an den Anfang von `Datenbankwerkzeug.java`.
-
 ```java
     public static final String SCHEMA = """
             ticket(id, kennung, titel, beschreibung, firma, melder, kategorie,
@@ -736,7 +736,6 @@ Die Konstante `SCHEMA` gehört an den Anfang von `Datenbankwerkzeug.java`.
             """;
 ```
 
----
 
 ## B18 — Die beiden Qute-Vorlagen
 
@@ -769,6 +768,13 @@ h2 { margin: 0 0 8px; font-size: 16px; }
 .raster { display: grid; grid-template-columns: 1fr 300px; gap: 24px;
           align-items: start; }
 @media (max-width: 900px) { .raster { grid-template-columns: 1fr; } }
+
+.neu { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+       background: #fff; border: 1px solid #e3e6e9; border-radius: 6px; padding: 10px; }
+.neu input, .neu select { font: inherit; font-size: 13px; padding: 5px 8px;
+       border: 1px solid #ccd1d6; border-radius: 4px; }
+.neu input[name="betreff"] { flex: 1 1 260px; }
+.neu button { font-weight: 600; }
 
 .filter { margin-bottom: 12px; }
 .filter button { margin-right: 6px; }
@@ -823,6 +829,28 @@ textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px;
 
   <div class="raster">
     <main>
+      <form class="neu" hx-post="/aktion/neu" hx-target="#zeilen" hx-swap="innerHTML"
+            hx-on::after-request="this.reset()">
+        <input name="betreff" placeholder="{beschriftung.neuBetreff}" required>
+        <input name="firma" placeholder="{beschriftung.neuFirma}" list="firmen">
+        <input name="melder" placeholder="{beschriftung.neuMelder}">
+        <select name="kategorie">
+          {#for k in beschriftung.kategorien}<option value="{k.schluessel}">{k.text}</option>{/for}
+        </select>
+        <select name="prioritaet">
+          {#for p in beschriftung.prioritaeten}<option value="{p.schluessel}">{p.text}</option>{/for}
+        </select>
+        <button type="submit">{beschriftung.neuAnlegen}</button>
+      </form>
+
+      <datalist id="firmen">
+        <option value="Nordlicht Werften GmbH"></option>
+        <option value="Stadtwerke Aurich"></option>
+        <option value="Kontor Sued AG"></option>
+        <option value="Praxis Dr. Hansen"></option>
+        <option value="Vos Logistik KG"></option>
+      </datalist>
+
       <div class="filter">
         <button data-filter="alle" hx-get="/teile?filter=alle"
                 hx-target="#zeilen" hx-swap="innerHTML">{beschriftung.filterAlle}</button>
@@ -924,10 +952,6 @@ strom.onmessage = function () {
 </html>
 ```
 
-Nach `src/main/resources/templates/Seiten/teile.html` — das htmx-Fragment mit
-den Tabellenzeilen. Die große Seite bindet dieselbe Vorlage per
-`{#include Seiten/teile /}` ein, damit der Zeilenaufbau nur einmal existiert.
-
 ```html
 {#for zeile in zeilen}
 <tr>
@@ -951,7 +975,6 @@ den Tabellenzeilen. Die große Seite bindet dieselbe Vorlage per
 {/for}
 ```
 
----
 
 ## B18 — Die beiden Sprachdateien
 
@@ -1013,6 +1036,13 @@ niemand=niemand
 
 # Der Bericht aus Block 9, jetzt als Download
 bericht.titel=SLA-Bericht herunterladen
+
+# Das Formular, mit dem eine Meldung hereinkommt
+neu.titel=Neues Ticket
+neu.betreff=Worum geht es?
+neu.firma=Firma
+neu.melder=Melder
+neu.anlegen=Anlegen
 ```
 
 ```properties
@@ -1070,9 +1100,15 @@ niemand=nobody
 
 # Der Bericht aus Block 9, jetzt als Download
 bericht.titel=Download SLA report
+
+# Das Formular, mit dem eine Meldung hereinkommt
+neu.titel=New ticket
+neu.betreff=What is the problem?
+neu.firma=Company
+neu.melder=Reported by
+neu.anlegen=Create
 ```
 
----
 
 ## Was hier absichtlich fehlt
 
