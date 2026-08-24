@@ -4,8 +4,18 @@ Hier steht alles, was du beim Bauen des ServiceDesk **kopierst** statt es zu
 tippen: Feld-für-Feld-Zuweisungen aus einem `ResultSet`, Bibliotheksaufrufe mit
 zwanzig Parametern, HTML, Sprachdateien. Was hier **nicht** steht, ist Absicht —
 der Kern jedes Blocks wird getippt, denn genau darum geht es in dem Block. Die
-Blocknummer in jeder Überschrift sagt dir, wann du den Abschnitt brauchst; alle
-Klassen liegen im Paket `de.netzfactor.servicedesk`.
+Blocknummer in jeder Überschrift sagt dir, wann du den Abschnitt brauchst.
+
+Die Klassen liegen in fünf Paketen — die `package`-Zeile in jedem Block sagt dir,
+wohin die Datei gehört:
+
+| Paket | Was darin steht |
+|---|---|
+| `de.netzfactor.servicedesk` | der Fachkern: was ein Ticket ist und was mit ihm passiert |
+| `…​.auswertung` | was man aus den Tickets herausrechnet: SLA, Feiertage, Berichte |
+| `…​.lager` | das Fremdsystem und der Weg dorthin |
+| `…​.ki` | Modell, Werkzeuge, Handbuchsuche |
+| `…​.web` | alles, was nach aussen spricht: REST, Vorlagen, Sprachen |
 
 ---
 
@@ -200,7 +210,7 @@ Bibliotheksaufrufe mit vielen Parametern und ohne Erkenntnisgewinn. `kopf`,
 den du tippst.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.auswertung;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -329,7 +339,7 @@ etwas anderes — die Klasse **blockiert** bei jedem Aufruf, und genau das wird 
 Block 15 zum Thema.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.lager;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -409,7 +419,7 @@ public class Lagerauskunft {
 ```
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.lager;
 
 /** Ein Ersatzteil, so wie das Lagersystem es liefert. */
 public record Teil(String nummer, String bezeichnung, int bestand, String lagerort) {
@@ -520,7 +530,7 @@ lange Zusicherungsketten, ein JSON-Rumpf, ein Mock-Aufbau. `SlaTest` und
 Lambda statt eines Mocks, und ein Ergebnistyp statt einer Exception.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.auswertung;
 
 import org.junit.jupiter.api.Test;
 
@@ -568,7 +578,7 @@ class BerichtsschreiberTest {
 ```
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.lager;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -605,7 +615,7 @@ class LagerauskunftTest {
 ```
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.web;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -680,7 +690,6 @@ class TicketRessourceTest {
 }
 ```
 
----
 
 ## B17 — Der System-Prompt und das Tabellenschema
 
