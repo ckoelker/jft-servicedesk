@@ -6,6 +6,12 @@ zwanzig Parametern, HTML, Sprachdateien. Was hier **nicht** steht, ist Absicht �
 der Kern jedes Blocks wird getippt, denn genau darum geht es in dem Block. Die
 Blocknummer in jeder Überschrift sagt dir, wann du den Abschnitt brauchst.
 
+**Was schon im Projekt liegt, steht hier nicht.** Die Pakete `domain` und `dto`
+sind beim Klonen bereits gefüllt: die drei Datenklassen `Ticket`, `Kommentar`
+und `Zeitbuchung`, die drei Aufzählungen `Prioritaet`, `Status` und `Kategorie`
+sowie sieben records, die nur Werte weiterreichen. Die musst du weder tippen
+noch kopieren — sie sind Beiwerk, nicht Stoff.
+
 Die Klassen liegen in fünf Paketen — die `package`-Zeile in jedem Block sagt dir,
 wohin die Datei gehört:
 
@@ -18,80 +24,6 @@ wohin die Datei gehört:
 | `…​.lager` | das Fremdsystem und der Weg dorthin |
 | `…​.ki` | Modell, Werkzeuge, Handbuchsuche |
 | `…​.web` | alles, was nach aussen spricht: REST, Vorlagen, Sprachen |
-
----
-
-## B06 — Die drei Klassen des Datenmodells
-
-Drei Dateien im Paket `de.netzfactor.servicedesk`: `Ticket.java`,
-`Kommentar.java` und `Zeitbuchung.java` — gewöhnliche Klassen mit public fields,
-noch ohne jede Annotation. In Block 12 kommen `@Entity`, `extends Basis` und die
-JPA-Annotationen dazu; die Felder, die du hier anlegst, bleiben unverändert
-stehen.
-
-```java
-package de.netzfactor.servicedesk.domain;
-
-import java.time.LocalDateTime;
-
-/**
- * Der Vorgang, um den sich alles dreht.
- *
- * <p>Firma, Melder und Bearbeiter stehen als Werte hier, nicht als Verweis auf
- * eine Stammdatentabelle - fuer diese Woche waeren das drei Joins ohne
- * Erkenntnisgewinn.
- */
-public class Ticket {
-
-    public String kennung;
-    public String titel;
-    public String beschreibung;
-    public String firma;
-    public String melder;
-    public Kategorie kategorie;
-    public Prioritaet prioritaet;
-    public Status status;
-
-    /** Leer, solange niemand zustaendig ist - der haeufigste Grund fuer eine gerissene Zusage. */
-    public String bearbeiter;
-
-    public LocalDateTime gemeldetAm;
-    public LocalDateTime erledigtAm;
-}
-```
-
-```java
-package de.netzfactor.servicedesk.domain;
-
-import java.time.LocalDateTime;
-
-/** Ein Eintrag im Verlauf eines Tickets. */
-public class Kommentar {
-
-    public String text;
-    public String autor;
-    public LocalDateTime geschriebenAm;
-
-    // Nur diese Richtung: eine Rueckliste am Ticket brauchte niemand, waere aber
-    // die erste Stelle, an der versehentlich alles nachgeladen wird.
-    public Ticket ticket;
-}
-```
-
-```java
-package de.netzfactor.servicedesk.domain;
-
-/** Gebuchte Arbeitszeit - die Grundlage des Auslastungsberichts. */
-public class Zeitbuchung {
-
-    public int minuten;
-    public String bearbeiter;
-
-    public Ticket ticket;
-}
-```
-
----
 
 ## B06 — Der Handbetrieb: `Datenbank.java`
 
@@ -459,7 +391,8 @@ public abstract class Basis extends PanacheEntityBase {
 }
 ```
 
-Danach bekommen die drei Klassen aus Block 6 ihre Annotationen. Es entsteht
+Danach bekommen die drei Datenklassen, die seit dem ersten Tag im Paket
+`domain` liegen, ihre Annotationen. Es entsteht
 keine neue Datei: Du ergänzt oben die Importe, setzt `@Entity` und
 `extends Basis` an die Klasse und schreibst die Annotationen vor die betroffenen
 Felder. Alle Felder bleiben, wie sie sind — den Schlüssel `id` bekommen die drei
@@ -1123,18 +1056,17 @@ neu.anlegen=Create
 
 ## Was hier absichtlich fehlt
 
-- **B06** — die Enums `Prioritaet`, `Status` und `Kategorie`
-- **B06** — das sealed interface `Ergebnis` und `Meldungsimport`
+- **B06** — `Meldungsimport` und `Fehler`
 - **B07** — `Kalender` und `Sla`
 - **B08** — `Zeilen` und die drei Auswertungen in `Berichte`
 - **B09** — die Annotation `@Spalte` und der Reflection-Teil des `Berichtsschreiber`
 - **B10** — `Braucht`, `Container` und `Ersatzteilpruefer`
-- **B11** — die REST-Ressourcen und die Ansichts-records
+- **B11** — die REST-Ressourcen sowie `dto.NeuesTicket`, `dto.NeuerKommentar` und `dto.Importergebnis`
 - **B12** — die Panache-Abfragen in den drei Entities
 - **B13** — die fünf Tests
 - **B14** — `Ticketstrom` und der Eskalationslauf
 - **B15** — die Schleife mit den virtual threads
-- **B16** — `Triagedienst` und der record `Triage`
+- **B16** — `Triagedienst` (der record `dto.Triage` liegt schon da)
 - **B17** — die `@Tool`-Methoden
 - **B18** — `Texte`, `Zeile`, `Beschriftung` und `Oberflaeche`
 

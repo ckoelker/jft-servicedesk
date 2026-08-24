@@ -48,6 +48,20 @@ nur die Kommentarzeichen weg; abgetippt wird nichts. Ein Blick in die Datei
 zeigt dir deshalb jederzeit, wie weit die Anwendung ist. Die
 `application.properties` ist genauso aufgebaut.
 
+## Was schon fertig im Projekt liegt
+
+Ein Teil ist Beiwerk und kein Stoff — den findest du beim Klonen bereits vor,
+damit die Zeit in die Sache geht statt ins Tippen:
+
+| Paket | Was |
+|---|---|
+| `domain` | `Ticket`, `Kommentar`, `Zeitbuchung` — noch als gewöhnliche Klassen ohne eine einzige Annotation. In Block 12 kommen die dazu, die Felder bleiben. |
+| `domain` | `Prioritaet`, `Status`, `Kategorie` — die drei Aufzählungen. `Kategorie` bringt die zugesagten Stunden gleich mit. |
+| `dto` | `TicketAnsicht`, `KommentarAnsicht`, `Ereignis`, `Meldung`, `Ergebnis`, `Triage`, `Eskalationslauf` — records, die nur Werte weiterreichen. |
+
+Alles andere entsteht im Kurs: getippt, was den Punkt des Blocks ausmacht,
+kopiert aus `BAUSTEINE.md`, was nur Fleißarbeit wäre.
+
 ## Wenn etwas klemmt
 
 ```bash
