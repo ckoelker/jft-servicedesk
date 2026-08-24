@@ -11,7 +11,9 @@ wohin die Datei gehört:
 
 | Paket | Was darin steht |
 |---|---|
-| `de.netzfactor.servicedesk` | der Fachkern: was ein Ticket ist und was mit ihm passiert |
+| `…​.domain` | was ein Ticket **ist**: die drei Klassen, die drei Aufzählungen, der JDBC-Lader |
+| `…​.dto` | was an der Aussengrenze rein- und rausgeht |
+| `de.netzfactor.servicedesk` | der Anwendungskern: was mit einem Ticket **passiert** |
 | `…​.auswertung` | was man aus den Tickets herausrechnet: SLA, Feiertage, Berichte |
 | `…​.lager` | das Fremdsystem und der Weg dorthin |
 | `…​.ki` | Modell, Werkzeuge, Handbuchsuche |
@@ -28,7 +30,7 @@ JPA-Annotationen dazu; die Felder, die du hier anlegst, bleiben unverändert
 stehen.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.domain;
 
 import java.time.LocalDateTime;
 
@@ -59,7 +61,7 @@ public class Ticket {
 ```
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.domain;
 
 import java.time.LocalDateTime;
 
@@ -77,7 +79,7 @@ public class Kommentar {
 ```
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.domain;
 
 /** Gebuchte Arbeitszeit - die Grundlage des Auslastungsberichts. */
 public class Zeitbuchung {
@@ -98,7 +100,8 @@ Nach `Datenbank.java`, gleiches Paket. Zwölf Felder einzeln aus einem
 ersatzlos wieder raus, weil Panache die Arbeit übernimmt.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.domain;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -177,7 +180,6 @@ public final class Datenbank {
 }
 ```
 
----
 
 ## B06 — Die Testdatei `meldungen.csv`
 
@@ -434,7 +436,7 @@ Zuerst die neue Datei `Basis.java` — der Schlüssel, den sich alle drei Entiti
 teilen.
 
 ```java
-package de.netzfactor.servicedesk;
+package de.netzfactor.servicedesk.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.GeneratedValue;
