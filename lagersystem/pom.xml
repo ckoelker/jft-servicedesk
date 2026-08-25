@@ -43,6 +43,22 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
+        <!-- Der Log4j-2-Adapter. Er bringt die Log4j-API mit und leitet sie an
+             den LogManager von Quarkus weiter. Deshalb steht hier weder
+             log4j-api noch log4j-core: waeren sie dabei, haetten wir zwei
+             Logsysteme im selben Lauf - und das geht nicht gut aus. -->
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>log4j2-jboss-logmanager</artifactId>
+        </dependency>
+        <!-- Nur fuer die Zusatzfunktion /ereignisse. Der ServiceDesk ruft die
+             nie auf - sie ist die Vorfuehrung zu teilnehmerwuensche/RXJAVA.md
+             und sonst nichts. -->
+        <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>3.1.12</version>
+        </dependency>
     </dependencies>
 
     <build>
