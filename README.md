@@ -93,6 +93,7 @@ curl -s -D - -X POST http://localhost:8082/mcp \
 
 | Ordner / Datei | Inhalt |
 |---|---|
+| `ANLEITUNG.md` | Die Anwendung im Ganzen: die Vorführung Schritt für Schritt, zum Nachmachen zu Hause. |
 | `datenbank/` | Schema und Beispieldaten als SQL. Läuft beim ersten Start des Containers einmal durch. |
 | `handbuch/` | Das Servicedesk-Handbuch als Markdown. Die Wissensquelle für die Handbuchsuche. |
 | `lagersystem/` | Ein eigenständiges Fremdsystem, das Ersatzteile herausgibt — per REST und per MCP. |
