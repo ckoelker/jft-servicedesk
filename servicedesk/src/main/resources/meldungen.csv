@@ -1,0 +1,11 @@
+firma;melder;titel;prioritaet
+Nordlicht Werften GmbH;Anke Brüggemann;Kran 3 meldet Störcode E17;HOCH
+Stadtwerke Aurich;Jens Ohlsen;Zählerauslesung bricht nachts ab;NORMAL
+Kontor Sued AG;Marit Voss;Rechnungslauf hängt in der Freigabe;DRINGEND
+Praxis Dr. Hansen;Silke Hansen;Kartenlesegerät ohne Verbindung;KRITISCH
+Vos Logistik KG;Timo Vos;Tourenplanung lädt keine Karten;NORMAL
+Nordlicht Werften GmbH;Anke Brüggemann;Ersatzteilsuche dauert zu lange
+Stadtwerke Aurich;Ole Frerichs;Portal meldet Wartung, obwohl offen;NIEDRIG
+Kontor Sued AG;Marit Voss;;HOCH
+Praxis Dr. Hansen;Silke Hansen;Terminkalender druckt jeden Termin doppelt;NIEDRIG
+Vos Logistik KG;Timo Vos;Barcodescanner verliert die Kopplung;HOCH

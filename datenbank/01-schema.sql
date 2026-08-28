@@ -40,6 +40,31 @@ CREATE TABLE zeitbuchung (
     ticket_id  bigint       NOT NULL REFERENCES ticket (id) ON DELETE CASCADE
 );
 
+-- Wer sich anmelden darf. Die Rollen stehen als Liste in einer Spalte, durch
+-- Komma getrennt - quarkus-security-jpa liest das Feld genau so.
+--
+-- Das Passwort steht hier im Klartext. Das ist fuer eine Vorfuehrung Absicht:
+-- so sieht man in dieser Datei, womit man sich anmeldet. In einer echten
+-- Anwendung stuende hier ein bcrypt-Hash und in der Entity kein
+-- @Password(PasswordType.CLEAR).
+CREATE TABLE benutzer (
+    id           bigserial     PRIMARY KEY,
+    benutzername varchar(255)  NOT NULL UNIQUE,
+    passwort     varchar(255)  NOT NULL,
+    rollen       varchar(255)  NOT NULL,
+    anzeigename  varchar(255)  NOT NULL
+);
+
+-- Der Tagesverbrauch je Benutzer. Eine Zeile je Benutzer und Tag, angelegt beim
+-- ersten Aufruf des Assistenten - deshalb ist die Tabelle am Anfang leer.
+CREATE TABLE tokenkonto (
+    id           bigserial     PRIMARY KEY,
+    benutzername varchar(255)  NOT NULL,
+    tag          date          NOT NULL,
+    verbraucht   integer       NOT NULL,
+    UNIQUE (benutzername, tag)
+);
+
 CREATE INDEX ix_ticket_status      ON ticket (status);
 CREATE INDEX ix_ticket_prioritaet  ON ticket (prioritaet);
 CREATE INDEX ix_kommentar_ticket   ON kommentar (ticket_id);

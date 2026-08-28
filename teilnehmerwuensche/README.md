@@ -11,12 +11,13 @@ wird vorgeführt, und der Code liegt fertig da, damit du später nachlesen kanns
 | [PROFILING.md](PROFILING.md) | Vier eingebaute Fehler und wie man sie grafisch findet |
 | [RXJAVA.md](RXJAVA.md) | Was von RxJava bleibt, seit es virtuelle Threads gibt |
 | [MODERNISIEREN.md](MODERNISIEREN.md) | Ein altes Java-5-Projekt auf JDK 25 ziehen |
+| [GRADLE.md](GRADLE.md) | Quarkus mit Gradle statt Maven — und warum wir hier bei Maven bleiben |
 
 ## Wo der Code liegt
 
 Alles im Modul `lagersystem/` — der Lagerverwaltung, die als Fremdsystem
-nebenher läuft. **Nicht** im `servicedesk/`: Das ist dein Projekt und bleibt
-schlank, damit die Blockfolge der Woche nicht durcheinandergerät.
+nebenher läuft. **Nicht** im `servicedesk/`: der bleibt schlank und zeigt nur,
+worum es in der Anwendung selbst geht.
 
 ```bash
 ./mvnw -pl lagersystem quarkus:dev

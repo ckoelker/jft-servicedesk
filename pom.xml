@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Die Klammer um die beiden Projekte der Woche: den ServiceDesk, der ab
-  Dienstagnachmittag Stueck fuer Stueck entsteht, und das fertige Lagersystem,
-  das nebenher als Fremdsystem laeuft.
+  Die Klammer um die beiden Projekte: den ServiceDesk und das Lagersystem, das
+  nebenher als Fremdsystem laeuft und seine Auskuenfte per REST und per MCP
+  herausgibt.
 
   Dieser Aggregator ist bequem, aber nicht noetig: beide Projekte haben eine
   eigene, vollstaendige pom.xml und bauen auch einzeln.

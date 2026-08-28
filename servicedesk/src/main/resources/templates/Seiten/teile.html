@@ -1,0 +1,20 @@
+{#for zeile in zeilen}
+<tr>
+  <td class="kennung">{zeile.kennung}</td>
+  <td>{zeile.titel}</td>
+  <td><span class="punkt prio-{zeile.prioritaetSchluessel}"></span>{zeile.prioritaet}</td>
+  <td>{zeile.status}</td>
+  <td>{zeile.kategorie}</td>
+  <td>{zeile.firma}</td>
+  <td class="datum">{zeile.gemeldet}</td>
+  <td>{zeile.bearbeiter}</td>
+  <td class="aktionen">
+    <button hx-post="/aktion/{zeile.kennung}/erledigt"
+            hx-target="#zeilen" hx-swap="innerHTML">&#10003;</button>
+    <button hx-post="/aktion/{zeile.kennung}/hoeher"
+            hx-target="#zeilen" hx-swap="innerHTML">&#8593;</button>
+    <button class="weg" hx-delete="/aktion/{zeile.kennung}"
+            hx-target="#zeilen" hx-swap="innerHTML">&#10005;</button>
+  </td>
+</tr>
+{/for}

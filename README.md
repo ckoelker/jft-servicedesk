@@ -1,11 +1,8 @@
 # ServiceDesk
 
-Das hier ist die Anwendung, an der du ab Dienstagnachmittag arbeitest: ein
-kleines Ticketsystem für einen IT-Servicedesk. Sie fängt als eine einzige
-Klasse mit einer `main`-Methode an und wächst dann Block für Block mit — bis
-sie am Freitag eine Quarkus-Anwendung mit REST, Persistenz, Tests, KI und
-Oberfläche ist. Gearbeitet wird von Anfang an gegen eine echte
-Postgres-Datenbank in Docker, nicht gegen Attrappen.
+Ein kleines Ticketsystem für einen IT-Servicedesk, als Quarkus-Anwendung mit
+REST, Persistenz, Tests, KI-Assistent und zweisprachiger Oberfläche. Gearbeitet
+wird gegen eine echte Postgres-Datenbank in Docker, nicht gegen Attrappen.
 
 ## Loslegen in drei Schritten
 
@@ -14,12 +11,15 @@ Postgres-Datenbank in Docker, nicht gegen Attrappen.
 #    Beispieldaten selbst an.
 docker compose up -d
 
-# 2. Den ServiceDesk laufen lassen.
-./mvnw -pl servicedesk exec:java -Dexec.mainClass=de.netzfactor.servicedesk.Start
-
-# 3. Nur wenn ein Block es verlangt: das Lagersystem nebenher starten.
+# 2. Das Lagersystem starten - der ServiceDesk holt sich von dort per MCP
+#    die Auskunft über Ersatzteile.
 ./mvnw -pl lagersystem quarkus:dev
+
+# 3. Den ServiceDesk starten.
+./mvnw -pl servicedesk quarkus:dev
 ```
+
+Danach liegt die Oberfläche auf <http://localhost:8080>.
 
 ## Ports
 
@@ -28,39 +28,70 @@ docker compose up -d
 | Postgres | 5433 |
 | ServiceDesk | 8080 |
 | Lagersystem | 8082 |
+| MCP-Endpunkt des Lagersystems | 8082, Pfad `/mcp` |
+
+## Anmeldung
+
+Zwei Benutzer stehen fest in der Datenbank, angelegt beim ersten Start des
+Containers:
+
+| Benutzer | Passwort | Rollen | Sieht den Assistenten |
+|---|---|---|---|
+| `mara` | `mara` | `bearbeiter`, `assistent` | ja |
+| `jonas` | `jonas` | `bearbeiter` | nein |
+
+Beide sehen dieselben Tickets. An dem einen Rollenunterschied hängt, ob der
+Kasten mit dem KI-Assistenten überhaupt gerendert wird — und ob `/assistent`
+antwortet oder mit 403 ablehnt.
+
+Die Passwörter stehen im Klartext in der Datenbank. Das ist für eine Vorführung
+Absicht und in [datenbank/01-schema.sql](datenbank/01-schema.sql) erklärt.
+
+## Der Assistent und seine Wächter
+
+Vor jedem Modellaufruf laufen drei Wächter, sortiert nach dem, was sie kosten.
+Der erste, der ablehnt, beendet die Kette:
+
+| Wächter | Prüft | Kosten |
+|---|---|---|
+| `Tokenwaechter` | Tagesbudget des angemeldeten Benutzers | eine Datenbankabfrage |
+| `Moderationswaechter` | ob der Inhalt zulässig ist | ein HTTP-Aufruf |
+| `Themenwaechter` | ob es überhaupt um IT-Tickets geht | ein Modellaufruf |
+
+Das Tagesbudget ist ein fester Wert je Benutzer aus
+`servicedesk/src/main/resources/application.properties`. Gebucht wird der
+tatsächliche Verbrauch, den das Modell meldet — nicht geschätzt.
+
+## Werkzeuge über MCP
+
+Der Assistent bekommt seine Werkzeuge aus drei Quellen: den eigenen Klassen im
+Paket `ki`, dem Lagersystem und der öffentlichen Dokumentation von Microsoft.
+Die letzten beiden sprechen MCP über Streamable HTTP:
+
+| Server | Adresse | Wofür |
+|---|---|---|
+| `lager` | `http://localhost:8082/mcp` | Bestand, Lagerort, knappe Teile |
+| `wissen` | `https://learn.microsoft.com/api/mcp` | Störungen an Windows, Office, Entra ID |
+
+Den Endpunkt des Lagersystems kann man von Hand ansprechen — MCP ist JSON-RPC
+über HTTP. Die Session-Kennung steht im Antwortkopf `Mcp-Session-Id`:
+
+```bash
+curl -s -D - -X POST http://localhost:8082/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"1"}}}'
+```
 
 ## Was in welchem Ordner liegt
 
 | Ordner / Datei | Inhalt |
 |---|---|
 | `datenbank/` | Schema und Beispieldaten als SQL. Läuft beim ersten Start des Containers einmal durch. |
-| `handbuch/` | Das Servicedesk-Handbuch als Markdown. Ab Freitag die Wissensquelle für die Suche. |
-| `lagersystem/` | Ein fertiges Fremdsystem, das Ersatzteile herausgibt. Wird nicht verändert. |
-| `servicedesk/` | Dein Projekt. Hier entsteht alles. |
-| `BAUSTEINE.md` | Die längeren Abschnitte zum Kopieren, damit du im Kurs nicht tippst. |
-
-## Die `pom.xml` wächst mit
-
-In `servicedesk/pom.xml` steht schon alles drin, was die Woche über gebraucht
-wird — das meiste davon auskommentiert, mit einer Blockmarke wie
-`B12: Persistenz` davor. Jeder Block der Schulung nimmt bei seinem Abschnitt
-nur die Kommentarzeichen weg; abgetippt wird nichts. Ein Blick in die Datei
-zeigt dir deshalb jederzeit, wie weit die Anwendung ist. Die
-`application.properties` ist genauso aufgebaut.
-
-## Was schon fertig im Projekt liegt
-
-Ein Teil ist Beiwerk und kein Stoff — den findest du beim Klonen bereits vor,
-damit die Zeit in die Sache geht statt ins Tippen:
-
-| Paket | Was |
-|---|---|
-| `domain` | `Ticket`, `Kommentar`, `Zeitbuchung` — noch als gewöhnliche Klassen ohne eine einzige Annotation. In Block 12 kommen die dazu, die Felder bleiben. |
-| `domain` | `Prioritaet`, `Status`, `Kategorie` — die drei Aufzählungen. `Kategorie` bringt die zugesagten Stunden gleich mit. |
-| `dto` | `TicketAnsicht`, `KommentarAnsicht`, `Ereignis`, `Meldung`, `Ergebnis`, `Triage`, `Eskalationslauf` — records, die nur Werte weiterreichen. |
-
-Alles andere entsteht im Kurs: getippt, was den Punkt des Blocks ausmacht,
-kopiert aus `BAUSTEINE.md`, was nur Fleißarbeit wäre.
+| `handbuch/` | Das Servicedesk-Handbuch als Markdown. Die Wissensquelle für die Handbuchsuche. |
+| `lagersystem/` | Ein eigenständiges Fremdsystem, das Ersatzteile herausgibt — per REST und per MCP. |
+| `servicedesk/` | Die Anwendung. |
+| `teilnehmerwuensche/` | Vorführungen zu Log4j, Profiling, RxJava, Gradle und Modernisierung. |
 
 ## Wenn etwas klemmt
 
@@ -75,9 +106,13 @@ docker exec -it servicedesk-db psql -U servicedesk -d servicedesk
 
 ## OpenAI-Schlüssel
 
-Ab Block 16 brauchst du einen Schlüssel. Er gehört in keine Datei im
-Projekt, sondern in die Umgebung:
+Der Assistent braucht einen Schlüssel. Er gehört in keine Datei im Projekt,
+sondern in die Umgebung:
 
 ```bash
 export QUARKUS_LANGCHAIN4J_OPENAI_API_KEY='sk-...'
 ```
+
+Der Moderationswächter ruft zusätzlich `/v1/moderations` auf. Darf der Schlüssel
+das nicht, springt eine Rückfallebene über das Chatmodell ein — nachzulesen in
+der `application.properties`.

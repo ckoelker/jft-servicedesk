@@ -22,6 +22,9 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.version>3.38.3</quarkus.platform.version>
+        <!-- Quarkiverse, nicht Platform: die Version steht deshalb hier und wird
+             unten ausdruecklich gesetzt. -->
+        <quarkus-mcp-server.version>2.0.0</quarkus-mcp-server.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
     </properties>
@@ -58,6 +61,15 @@
             <groupId>io.reactivex.rxjava3</groupId>
             <artifactId>rxjava</artifactId>
             <version>3.1.12</version>
+        </dependency>
+
+        <!-- Der MCP-Server. "http" ist der Streamable-HTTP-Transport: ein
+             einziger Endpunkt unter /mcp. Die Geschwister -sse und -stdio
+             brauchen wir nicht und holen wir deshalb auch nicht. -->
+        <dependency>
+            <groupId>io.quarkiverse.mcp</groupId>
+            <artifactId>quarkus-mcp-server-http</artifactId>
+            <version>${quarkus-mcp-server.version}</version>
         </dependency>
     </dependencies>
 

@@ -1,242 +1,236 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Diese Datei ist der Fortschrittsbalken der Woche. Aktiv ist am Anfang nur das
-  Noetigste; alles Weitere steht schon hier, aber auskommentiert und mit einer
-  Blockmarke davor. Jeder Block der Schulung kommentiert genau seinen Abschnitt
-  ein - nie abtippen, nur die Kommentarzeichen wegnehmen. Ein Blick in die Datei
-  sagt dir jederzeit, wie weit die Anwendung ist.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.netzfactor.schulung</groupId>
-    <artifactId>servicedesk</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <name>ServiceDesk</name>
+  <groupId>de.netzfactor.schulung</groupId>
+  <artifactId>servicedesk</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
 
-    <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  <name>ServiceDesk</name>
+  <description>Ticketsystem fuer einen IT-Servicedesk: REST, Persistenz, Tests, KI-Assistent und Oberflaeche.</description>
 
-        <!-- Alle Versionen stehen von Anfang an hier, auch die spaeteren: so faellt
-             beim Einkommentieren wirklich nur ein Kommentarzeichen weg. -->
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.38.3</quarkus.platform.version>
-        <quarkus-langchain4j.version>1.13.0</quarkus-langchain4j.version>
-        <postgresql.version>42.7.7</postgresql.version>
-        <poi.version>5.4.1</poi.version>
-        <openpdf.version>2.0.3</openpdf.version>
-        <junit.version>5.14.0</junit.version>
-        <assertj.version>3.27.6</assertj.version>
-        <mockito.version>5.20.0</mockito.version>
-        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-        <exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
-    </properties>
+  <properties>
+    <maven.compiler.release>25</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <dependencyManagement>
-        <dependencies>
+    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+    <quarkus.platform.version>3.38.3</quarkus.platform.version>
+    <quarkus-langchain4j.version>1.13.0</quarkus-langchain4j.version>
 
-            <!-- B10: Quarkus - die Platform-BOM legt die Versionen aller Quarkus-Extensions fest, deshalb steht bei denen unten keine.
-            <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                <version>${quarkus.platform.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            -->
+    <postgresql.version>42.7.7</postgresql.version>
+    <poi.version>5.4.1</poi.version>
+    <openpdf.version>2.0.3</openpdf.version>
 
-            <!-- B13: Tests - die JUnit-BOM haelt Jupiter, Platform und Engine auf demselben Stand.
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${junit.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            -->
+    <junit.version>5.14.0</junit.version>
+    <assertj.version>3.27.6</assertj.version>
+    <mockito.version>5.20.0</mockito.version>
 
-            <!-- B16: KI - eigene BOM fuer die LangChain4j-Extensions, die nicht in der Quarkus-Platform stecken.
-            <dependency>
-                <groupId>io.quarkiverse.langchain4j</groupId>
-                <artifactId>quarkus-langchain4j-bom</artifactId>
-                <version>${quarkus-langchain4j.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            -->
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+    <exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+  </properties>
 
-        </dependencies>
-    </dependencyManagement>
-
+  <dependencyManagement>
     <dependencies>
-
-        <!-- Der JDBC-Treiber: von der ersten Minute an reden wir mit einer echten Datenbank. -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-        </dependency>
-
-        <!-- B09: Excel und PDF - Apache POI schreibt die Tabelle, OpenPDF den Bericht.
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.librepdf</groupId>
-            <artifactId>openpdf</artifactId>
-            <version>${openpdf.version}</version>
-        </dependency>
-        -->
-
-        <!-- B10: Quarkus - arc ist der CDI-Kern; damit wird aus dem Programm eine Anwendung.
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc</artifactId>
-        </dependency>
-        -->
-
-        <!-- B11: REST und Validierung - REST mit Jackson fuer JSON, Hibernate Validator fuer die Pruefung der Eingaben.
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-jackson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-hibernate-validator</artifactId>
-        </dependency>
-        -->
-
-        <!-- B12: Persistenz - Hibernate ORM mit Panache und der Postgres-Datasource.
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-hibernate-orm-panache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
-        </dependency>
-        -->
-
-        <!-- B13: Tests - JUnit 5 mit AssertJ und Mockito, dazu die Quarkus-Testunterstuetzung und RestAssured fuer die Endpunkte.
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
-        -->
-
-        <!-- B16: KI - der OpenAI-Anschluss von LangChain4j; der Schluessel kommt aus der Umgebung, nie aus einer Datei.
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-openai</artifactId>
-        </dependency>
-        -->
-
-        <!-- B17: Handbuchsuche - pgvector macht aus der vorhandenen Datenbank den Speicher fuer die Embeddings.
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-pgvector</artifactId>
-        </dependency>
-        -->
-
-        <!-- B18: Oberflaeche - Qute rendert die Seiten serverseitig, ohne eigenes Frontend-Projekt.
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-qute</artifactId>
-        </dependency>
-        -->
-
+      <dependency>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>${quarkus.platform.artifact-id}</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkiverse.langchain4j</groupId>
+        <artifactId>quarkus-langchain4j-bom</artifactId>
+        <version>${quarkus-langchain4j.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
 
-    <build>
-        <plugins>
+  <dependencies>
+    <!-- Der JDBC-Treiber. -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
 
-            <!-- parameters=true haelt die Parameternamen im Bytecode; davon leben spaeter Jackson, CDI und Panache. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                </configuration>
-            </plugin>
+    <!-- Berichte: Apache POI schreibt die Tabelle, OpenPDF das PDF. -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>${poi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.librepdf</groupId>
+      <artifactId>openpdf</artifactId>
+      <version>${openpdf.version}</version>
+    </dependency>
 
-            <!-- Damit laeuft eine main-Methode direkt aus Maven heraus. Die System-Property
-                 haelt Apache POI ab Block 9 davon ab, eine Log4j-Warnung auszugeben. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <configuration>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>log4j2.loggerContextFactory</key>
-                            <value>org.apache.logging.log4j.simple.SimpleLoggerContextFactory</value>
-                        </systemProperty>
-                    </systemProperties>
-                </configuration>
-            </plugin>
+    <!-- Quarkus, REST, Validierung. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-validator</artifactId>
+    </dependency>
 
-            <!-- B10: Quarkus - dieses Plugin baut die Anwendung und bringt den Entwicklungsmodus quarkus:dev mit.
-            <plugin>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.platform.version}</version>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
+    <!-- Der Moderationswaechter spricht die Moderations-API als
+         typisiertes Interface an, nicht mit einem eigenen HttpClient. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-jackson</artifactId>
+    </dependency>
 
-            <!-- B13: Tests - ohne diesen LogManager meckert Quarkus beim Start jedes Tests.
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                        <log4j2.loggerContextFactory>org.apache.logging.log4j.simple.SimpleLoggerContextFactory</log4j2.loggerContextFactory>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            -->
+    <!-- Persistenz. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-orm-panache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
 
-        </plugins>
-    </build>
+    <!-- Anmeldung. Die Benutzer stehen in derselben Datenbank wie die
+         Tickets - security-jpa macht aus einer Entity die Benutzerverwaltung. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-security-jpa</artifactId>
+    </dependency>
+
+    <!-- KI, Werkzeuge, Handbuchsuche. -->
+    <dependency>
+      <groupId>io.quarkiverse.langchain4j</groupId>
+      <artifactId>quarkus-langchain4j-openai</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.langchain4j</groupId>
+      <artifactId>quarkus-langchain4j-pgvector</artifactId>
+    </dependency>
+
+    <!-- MCP. Der Assistent holt sich die Werkzeuge des Lagersystems ueber
+         das Protokoll statt ueber eine selbstgeschriebene HTTP-Klasse. -->
+    <dependency>
+      <groupId>io.quarkiverse.langchain4j</groupId>
+      <artifactId>quarkus-langchain4j-mcp</artifactId>
+    </dependency>
+
+    <!-- Die Oberflaeche. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-qute</artifactId>
+    </dependency>
+
+    <!-- Tests. -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- @TestSecurity setzt den angemeldeten Benutzer im Test, ohne dass
+         der Test sich anmelden muesste. -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-test-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <!-- Die Parameternamen bleiben erhalten: LangChain4j fuellt darueber
+               die Platzhalter in @UserMessage. -->
+          <parameters>true</parameters>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <configuration>
+          <systemPropertyVariables>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+            <!-- Sonst meldet sich Apache POI im Testlauf mit "Log4j API could
+                 not find a logging provider" - hier laeuft aber kein Logging. -->
+            <log4j2.loggerContextFactory>org.apache.logging.log4j.simple.SimpleLoggerContextFactory</log4j2.loggerContextFactory>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${exec-maven-plugin.version}</version>
+        <configuration>
+          <systemProperties>
+            <systemProperty>
+              <!-- Apache POI meldet sich sonst mit "Log4j API could not find a
+                   logging provider" - hier laeuft aber gar kein Logging. -->
+              <key>log4j2.loggerContextFactory</key>
+              <value>org.apache.logging.log4j.simple.SimpleLoggerContextFactory</value>
+            </systemProperty>
+          </systemProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

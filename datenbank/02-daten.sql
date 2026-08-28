@@ -87,3 +87,13 @@ SELECT 15 * (((t.id + c.k) % 8) + 1),
 FROM ticket t
 CROSS JOIN LATERAL generate_series(1, (t.id % 5) + 1) AS c(k)
 WHERE t.bearbeiter IS NOT NULL;
+
+-- Die beiden festen Anmeldungen. Beide sind Bearbeiter und sehen dieselben
+-- Tickets; nur Mara hat zusaetzlich die Rolle "assistent" und damit den
+-- KI-Assistenten auf der Seite. An diesem einen Unterschied haengt die ganze
+-- Vorfuehrung der Rollentrennung.
+--
+-- Passwoerter im Klartext, siehe die Anmerkung an der Tabelle in 01-schema.sql.
+INSERT INTO benutzer (benutzername, passwort, rollen, anzeigename) VALUES
+    ('mara',  'mara',  'bearbeiter,assistent', 'Mara Kruse'),
+    ('jonas', 'jonas', 'bearbeiter',           'Jonas Feld');

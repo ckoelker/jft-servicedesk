@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{titel}</title>
+<style>{|
+body { font-family: system-ui, "Segoe UI", Arial, sans-serif; margin: 0;
+       color: #23282d; background: #f6f7f9;
+       display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+form { background: #fff; border: 1px solid #e3e6e9; border-radius: 6px;
+       padding: 28px 32px; width: 320px; }
+h1 { margin: 0 0 20px; font-size: 20px; }
+label { display: block; font-size: 13px; color: #6b7280; margin-bottom: 4px; }
+input { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px;
+        padding: 7px 9px; margin-bottom: 14px;
+        border: 1px solid #ccd1d6; border-radius: 4px; }
+button { font: inherit; font-size: 14px; font-weight: 600; width: 100%;
+         padding: 8px 12px; cursor: pointer; background: #2f6fb2; color: #fff;
+         border: 1px solid #2f6fb2; border-radius: 4px; }
+button:hover { background: #285f99; }
+.fehler { background: #fdecec; border: 1px solid #f0b4b4; color: #a12a2a;
+          border-radius: 4px; padding: 8px 10px; font-size: 13px; margin-bottom: 16px; }
+.hinweis { margin: 18px 0 0; font-size: 12px; line-height: 1.6; color: #6b7280;
+           border-top: 1px solid #eceff1; padding-top: 12px; white-space: pre-line; }
+|}</style>
+</head>
+<body>
+
+<!-- Das Ziel ist nicht frei gewaehlt: /j_security_check ist der Endpunkt, den
+     das Formular-Verfahren von Quarkus selbst bedient. Es gibt in dieser
+     Anwendung keine Methode, die das Formular entgegennimmt. -->
+<form method="post" action="/j_security_check">
+  <h1>{titel}</h1>
+
+  {#if fehler}<p class="fehler">{fehler}</p>{/if}
+
+  <label for="j_username">{benutzername}</label>
+  <input id="j_username" name="j_username" autocomplete="username" autofocus required>
+
+  <label for="j_password">{passwort}</label>
+  <input id="j_password" name="j_password" type="password" autocomplete="current-password" required>
+
+  <button type="submit">{senden}</button>
+
+  <p class="hinweis">{hinweis}</p>
+</form>
+
+</body>
+</html>

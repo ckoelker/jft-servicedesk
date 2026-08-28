@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="{beschriftung.sprache}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{beschriftung.titel}</title>
+<style>{|
+body { font-family: system-ui, "Segoe UI", Arial, sans-serif; margin: 0;
+       color: #23282d; background: #f6f7f9; }
+.rahmen { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+
+h1 { margin: 0 0 4px; font-size: 26px; }
+h2 { margin: 0 0 8px; font-size: 16px; }
+.unter { margin: 0; color: #6b7280; }
+.zahlen { margin: 12px 0 0; font-size: 14px; color: #6b7280; }
+
+.strom { margin: 4px 0 20px; font-size: 13px; color: #6b7280; }
+.ampel { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+         margin-right: 6px; background: #b9bec4; }
+.ampel.an { background: #3f9b4f; }
+.ampel.aus { background: #d64545; }
+
+.raster { display: grid; grid-template-columns: 1fr 300px; gap: 24px;
+          align-items: start; }
+/* Ohne den Assistentenkasten nimmt die Tabelle die ganze Breite. */
+.raster.breit { grid-template-columns: 1fr; }
+@media (max-width: 900px) { .raster { grid-template-columns: 1fr; } }
+
+.neu { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+       background: #fff; border: 1px solid #e3e6e9; border-radius: 6px; padding: 10px; }
+.neu input, .neu select { font: inherit; font-size: 13px; padding: 5px 8px;
+       border: 1px solid #ccd1d6; border-radius: 4px; }
+.neu input[name="betreff"] { flex: 1 1 260px; }
+.neu button { font-weight: 600; }
+
+.filter { margin-bottom: 12px; }
+.filter button { margin-right: 6px; }
+.bericht { margin-left: 18px; font-size: 13px; color: #5b636b; }
+.bericht a { margin-left: 6px; }
+
+button { font: inherit; font-size: 13px; padding: 5px 12px; cursor: pointer;
+         border: 1px solid #ccd1d6; border-radius: 4px; background: #fff; }
+button:hover { border-color: #8f979f; }
+button.weg:hover { border-color: #d64545; color: #d64545; }
+
+table { width: 100%; border-collapse: collapse; background: #fff;
+        border: 1px solid #e3e6e9; border-radius: 6px; font-size: 14px; }
+th { text-align: left; font-weight: 600; color: #6b7280; font-size: 12px;
+     text-transform: uppercase; letter-spacing: .04em; }
+th, td { padding: 9px 12px; border-bottom: 1px solid #eceff1; }
+tr:last-child td { border-bottom: none; }
+.kennung { font-family: ui-monospace, Consolas, monospace; white-space: nowrap; }
+.datum { white-space: nowrap; }
+.aktionen { white-space: nowrap; }
+.aktionen button { padding: 3px 8px; margin-left: 3px; }
+
+.punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+         margin-right: 7px; background: #b9bec4; }
+.prio-KRITISCH { background: #d64545; }
+.prio-HOCH { background: #e08a1e; }
+.prio-NORMAL { background: #2f6fb2; }
+.prio-NIEDRIG { background: #9aa1a8; }
+
+aside { background: #fff; border: 1px solid #e3e6e9; border-radius: 6px;
+        padding: 14px; }
+textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px;
+           height: 90px; padding: 7px; border: 1px solid #ccd1d6;
+           border-radius: 4px; resize: vertical; }
+#antwort { margin-top: 12px; font-size: 14px; line-height: 1.5;
+           white-space: pre-wrap; }
+#antwort.abgelehnt { color: #a12a2a; }
+
+.wer { float: right; font-size: 13px; color: #6b7280; }
+.wer a { color: #2f6fb2; margin-left: 10px; }
+|}</style>
+<script src="/htmx.min.js"></script>
+</head>
+
+<body data-denkt="{beschriftung.chatDenkt}"
+      data-verbunden="{beschriftung.stromVerbunden}"
+      data-getrennt="{beschriftung.stromGetrennt}">
+<div class="rahmen">
+
+  <header>
+    <p class="wer">{beschriftung.angemeldetAls}<a href="/abmelden">{beschriftung.abmelden}</a></p>
+    <h1>{beschriftung.titel}</h1>
+    <p class="unter">{beschriftung.untertitel}</p>
+    <p class="zahlen">{beschriftung.zusammenfassung}</p>
+    <p class="strom"><span id="ampel" class="ampel"></span><span id="stromtext"></span></p>
+  </header>
+
+  <div class="raster{#if !beschriftung.darfAssistent} breit{/if}">
+    <main>
+      <form class="neu" hx-post="/aktion/neu" hx-target="#zeilen" hx-swap="innerHTML"
+            hx-on::after-request="this.reset()">
+        <input name="betreff" placeholder="{beschriftung.neuBetreff}" required>
+        <input name="firma" placeholder="{beschriftung.neuFirma}" list="firmen">
+        <input name="melder" placeholder="{beschriftung.neuMelder}">
+        <select name="kategorie">
+          {#for k in beschriftung.kategorien}<option value="{k.schluessel}">{k.text}</option>{/for}
+        </select>
+        <select name="prioritaet">
+          {#for p in beschriftung.prioritaeten}<option value="{p.schluessel}">{p.text}</option>{/for}
+        </select>
+        <button type="submit">{beschriftung.neuAnlegen}</button>
+      </form>
+
+      <datalist id="firmen">
+        <option value="Nordlicht Werften GmbH"></option>
+        <option value="Stadtwerke Aurich"></option>
+        <option value="Kontor Sued AG"></option>
+        <option value="Praxis Dr. Hansen"></option>
+        <option value="Vos Logistik KG"></option>
+      </datalist>
+
+      <div class="filter">
+        <button data-filter="alle" hx-get="/teile?filter=alle"
+                hx-target="#zeilen" hx-swap="innerHTML">{beschriftung.filterAlle}</button>
+        <button data-filter="offen" hx-get="/teile?filter=offen"
+                hx-target="#zeilen" hx-swap="innerHTML">{beschriftung.filterOffen}</button>
+        <button data-filter="kritisch" hx-get="/teile?filter=kritisch"
+                hx-target="#zeilen" hx-swap="innerHTML">{beschriftung.filterKritisch}</button>
+
+        <span class="bericht">{beschriftung.berichtTitel}:
+          <a href="/tickets/bericht.xlsx?art=sla">Excel</a>
+          <a href="/tickets/bericht.pdf?art=sla">PDF</a>
+        </span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>{beschriftung.spalteKennung}</th>
+            <th>{beschriftung.spalteTitel}</th>
+            <th>{beschriftung.spaltePrioritaet}</th>
+            <th>{beschriftung.spalteStatus}</th>
+            <th>{beschriftung.spalteKategorie}</th>
+            <th>{beschriftung.spalteFirma}</th>
+            <th>{beschriftung.spalteGemeldet}</th>
+            <th>{beschriftung.spalteBearbeiter}</th>
+            <th>{beschriftung.spalteAktion}</th>
+          </tr>
+        </thead>
+        <!-- Dieselbe Vorlage wie das htmx-Fragment: der Zeilenaufbau steht nur einmal. -->
+        <tbody id="zeilen">{#include Seiten/teile /}</tbody>
+      </table>
+    </main>
+
+    <!-- Der ganze Kasten haengt an der Rolle. Wer sie nicht hat, bekommt die
+         Spalte nicht zu sehen - und /assistent ausserdem mit 403 beantwortet. -->
+    {#if beschriftung.darfAssistent}
+    <aside>
+      <h2>{beschriftung.chatTitel}</h2>
+      <textarea id="frage" placeholder="{beschriftung.chatPlatzhalter}"></textarea>
+      <p><button id="senden">{beschriftung.chatSenden}</button></p>
+      <div id="antwort"></div>
+    </aside>
+    {/if}
+  </div>
+
+</div>
+
+<script>{|
+var frage = document.getElementById('frage');
+var antwort = document.getElementById('antwort');
+var senden = document.getElementById('senden');
+var sitzung = 'web-' + Math.random().toString(36).slice(2);
+
+// Ohne die Rolle "assistent" steht der Kasten gar nicht in der Seite. Dann gibt
+// es hier nichts zu tun - und ohne diese Abfrage einen Fehler in der Konsole.
+if (senden) {
+  senden.addEventListener('click', function () {
+    var text = frage.value.trim();
+    if (!text) { return; }
+    antwort.className = '';
+    antwort.textContent = document.body.dataset.denkt;
+    fetch('/assistent?sitzung=' + sitzung, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: text
+    }).then(function (rueck) {
+      // 403 kommt von einem Waechter: der Text ist die Begruendung, kein Fehler.
+      var abgelehnt = rueck.status === 403;
+      return rueck.text().then(function (gesagt) {
+        antwort.className = abgelehnt ? 'abgelehnt' : '';
+        antwort.textContent = gesagt;
+      });
+    }).catch(function (fehler) {
+      antwort.className = 'abgelehnt';
+      antwort.textContent = String(fehler);
+    });
+  });
+}
+|}</script>
+
+<script>{|
+var aktuellerFilter = 'alle';
+var ampel = document.getElementById('ampel');
+var stromtext = document.getElementById('stromtext');
+stromtext.textContent = document.body.dataset.getrennt;
+
+document.querySelectorAll('.filter button').forEach(function (knopf) {
+  knopf.addEventListener('click', function () { aktuellerFilter = knopf.dataset.filter; });
+});
+
+// Der Filter haengt an der Seite, nicht am Knopf - die Aktionen bekommen ihn erst hier dazu.
+document.body.addEventListener('htmx:configRequest', function (fall) {
+  if (fall.detail.path.indexOf('/aktion/') === 0) {
+    fall.detail.path += '?filter=' + aktuellerFilter;
+  }
+});
+
+var strom = new EventSource('/tickets/strom');
+strom.onopen = function () {
+  ampel.className = 'ampel an';
+  stromtext.textContent = document.body.dataset.verbunden;
+};
+strom.onerror = function () {
+  ampel.className = 'ampel aus';
+  stromtext.textContent = document.body.dataset.getrennt;
+};
+strom.onmessage = function () {
+  htmx.ajax('GET', '/teile?filter=' + aktuellerFilter, '#zeilen');
+};
+|}</script>
+
+</body>
+</html>
