@@ -55,8 +55,14 @@ Der erste, der ablehnt, beendet die Kette:
 | Wächter | Prüft | Kosten |
 |---|---|---|
 | `Tokenwaechter` | Tagesbudget des angemeldeten Benutzers | eine Datenbankabfrage |
-| `Moderationswaechter` | ob der Inhalt zulässig ist | ein HTTP-Aufruf |
+| `Inhaltswaechter` | ob der Inhalt zulässig ist | ein Modellaufruf |
 | `Themenwaechter` | ob es überhaupt um IT-Tickets geht | ein Modellaufruf |
+
+Die beiden letzten fragen dasselbe Chatmodell, das auch den Assistenten
+antreibt — kein zweiter Dienst und kein zweiter Zugang. Was jeweils als
+unzulässig beziehungsweise als fachfremd gilt, steht als Text im Prompt von
+`Inhaltspruefer` und `Themenpruefer` und lässt sich dort ändern, ohne eine Zeile
+Code anzufassen.
 
 Das Tagesbudget ist ein fester Wert je Benutzer aus
 `servicedesk/src/main/resources/application.properties`. Gebucht wird der
@@ -113,6 +119,5 @@ sondern in die Umgebung:
 export QUARKUS_LANGCHAIN4J_OPENAI_API_KEY='sk-...'
 ```
 
-Der Moderationswächter ruft zusätzlich `/v1/moderations` auf. Darf der Schlüssel
-das nicht, springt eine Rückfallebene über das Chatmodell ein — nachzulesen in
-der `application.properties`.
+Dieser eine Schlüssel reicht für alles: Assistent, Handbuchsuche und beide
+Wächter sprechen dasselbe Modell an.

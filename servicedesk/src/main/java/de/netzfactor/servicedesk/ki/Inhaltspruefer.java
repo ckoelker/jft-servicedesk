@@ -6,15 +6,14 @@ import io.quarkiverse.langchain4j.RegisterAiService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
- * Die Rueckfallebene des {@link Moderationswaechter}, wenn die Moderations-API
- * nicht zur Verfuegung steht.
+ * Beantwortet dem {@link Inhaltswaechter} die eine Frage, ob eine Eingabe
+ * unzulaessig ist.
  *
- * <p>Dieselbe Frage, anderes Werkzeug: statt eines darauf spezialisierten
- * Dienstes beantwortet sie hier das Chatmodell, das ohnehin schon angebunden
- * ist. Das ist die schlechtere Loesung - langsamer, teurer, weniger
- * verlaesslich, und es gibt keine Kategorien und keine Punktzahlen zurueck,
- * sondern ein Wort. Aber es laeuft ueberall dort, wo der Assistent selbst
- * laeuft, und das ist der Zweck einer Rueckfallebene.
+ * <p>Gefragt wird das Chatmodell, das ohnehin schon angebunden ist - kein
+ * zweiter Dienst, kein zweiter Zugang, keine zweite Freischaltung. Was als
+ * unzulaessig gilt, steht unten als Text und laesst sich im Kurs vor aller
+ * Augen aendern. Der Preis: es kommt ein Wort zurueck und keine Kategorien mit
+ * Punktzahlen, wie ein spezialisierter Moderationsdienst sie liefern wuerde.
  *
  * <p>Wie der {@link Themenpruefer}: ohne Werkzeuge, ohne Gedaechtnis, ohne
  * Guardrails - sonst riefe er sich selbst auf.

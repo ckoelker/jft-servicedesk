@@ -94,13 +94,6 @@
       <artifactId>quarkus-hibernate-validator</artifactId>
     </dependency>
 
-    <!-- Der Moderationswaechter spricht die Moderations-API als
-         typisiertes Interface an, nicht mit einem eigenen HttpClient. -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-rest-client-jackson</artifactId>
-    </dependency>
-
     <!-- Persistenz. -->
     <dependency>
       <groupId>io.quarkus</groupId>

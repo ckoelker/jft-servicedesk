@@ -47,13 +47,11 @@ public interface Assistent {
      * "abgelehnt" fuer eine einzige Frage.
      * <ol>
      *   <li>{@link Tokenwaechter} - eine Datenbankabfrage. Darf der Benutzer noch?</li>
-     *   <li>{@link Moderationswaechter} - ein HTTP-Aufruf, den OpenAI nicht
-     *       berechnet. Ist der Inhalt zulaessig?</li>
-     *   <li>{@link Themenwaechter} - ein ganzer Modellaufruf. Geht es ueberhaupt
-     *       um IT-Tickets?</li>
+     *   <li>{@link Inhaltswaechter} - ein Modellaufruf. Ist der Inhalt zulaessig?</li>
+     *   <li>{@link Themenwaechter} - noch einer. Geht es ueberhaupt um IT-Tickets?</li>
      * </ol>
      */
-    @InputGuardrails({ Tokenwaechter.class, Moderationswaechter.class, Themenwaechter.class })
+    @InputGuardrails({ Tokenwaechter.class, Inhaltswaechter.class, Themenwaechter.class })
     @ToolBox({ Ticketwerkzeuge.class, Datenbankwerkzeug.class })
     @McpToolBox({ "lager", "wissen" })
     @SystemMessage("""
